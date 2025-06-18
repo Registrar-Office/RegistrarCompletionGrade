@@ -21,27 +21,107 @@
                         </div>
                     @endif
                     
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold">Pending Incomplete Grade Applications</h3>
-                        <a href="{{ route('dean.signature') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                            Manage Signature
-                        </a>
+                    <!-- Submitted Applications Section -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">Applications Awaiting Review</h3>
+                            <a href="{{ route('dean.signature') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                                Manage Signature
+                            </a>
+                        </div>
+                        
+                        @if($submittedApplications->isEmpty())
+                            <div class="text-center py-4 bg-gray-50 rounded-lg">
+                                <p>No applications awaiting your review at this time.</p>
+                            </div>
+                        @else
+                            <form action="{{ route('dean.bulk-approve') }}" method="POST">
+                                @csrf
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full bg-white border border-gray-200">
+                                        <thead>
+                                            <tr>
+                                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                    <input type="checkbox" id="select-all" class="form-checkbox h-4 w-4">
+                                                </th>
+                                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                    Student
+                                                </th>
+                                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                    Course
+                                                </th>
+                                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                    Instructor
+                                                </th>
+                                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                    Deadline
+                                                </th>
+                                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($submittedApplications as $application)
+                                                <tr class="bg-blue-50">
+                                                    <td class="py-2 px-4 border-b border-gray-200">
+                                                        <input type="checkbox" name="selected_applications[]" value="{{ $application->id }}" class="application-checkbox form-checkbox h-4 w-4">
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b border-gray-200">
+                                                        {{ $application->user->name }} ({{ $application->user->id_number }})
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b border-gray-200">
+                                                        {{ $application->course->code }} - {{ $application->course->title }}
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b border-gray-200">
+                                                        {{ $application->course->instructor_name }}
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b border-gray-200">
+                                                        {{ $application->submission_deadline->format('M d, Y') }}
+                                                    </td>
+                                                    <td class="py-2 px-4 border-b border-gray-200">
+                                                        <div class="flex space-x-2">
+                                                            <a href="{{ route('dean.show', $application->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-xs">
+                                                                View
+                                                            </a>
+                                                            <a href="{{ route('dean.approve', $application->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded text-xs" onclick="return confirm('Are you sure you want to approve this application?')">
+                                                                Approve
+                                                            </a>
+                                                            <button type="button" onclick="showRejectModal({{ $application->id }})" class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded text-xs">
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <button type="submit" id="bulk-approve-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50" disabled>
+                                        Bulk Approve Selected
+                                    </button>
+                                </div>
+                            </form>
+                        @endif
                     </div>
                     
-                    @if($pendingApplications->isEmpty())
-                        <div class="text-center py-4">
-                            <p>No pending applications found for your college.</p>
+                    <!-- All Applications Section -->
+                    <div class="mt-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold">All Grade Completion Applications</h3>
                         </div>
-                    @else
-                        <form action="{{ route('dean.bulk-approve') }}" method="POST">
-                            @csrf
+                        
+                        @if($allApplications->isEmpty())
+                            <div class="text-center py-4">
+                                <p>No applications found for your college.</p>
+                            </div>
+                        @else
                             <div class="overflow-x-auto">
                                 <table class="min-w-full bg-white border border-gray-200">
                                     <thead>
                                         <tr>
-                                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                                <input type="checkbox" id="select-all" class="form-checkbox h-4 w-4">
-                                            </th>
                                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                                 Student
                                             </th>
@@ -55,16 +135,16 @@
                                                 Deadline
                                             </th>
                                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                                Status
+                                            </th>
+                                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                                 Actions
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($pendingApplications as $application)
+                                        @foreach($allApplications as $application)
                                             <tr>
-                                                <td class="py-2 px-4 border-b border-gray-200">
-                                                    <input type="checkbox" name="selected_applications[]" value="{{ $application->id }}" class="application-checkbox form-checkbox h-4 w-4">
-                                                </td>
                                                 <td class="py-2 px-4 border-b border-gray-200">
                                                     {{ $application->user->name }} ({{ $application->user->id_number }})
                                                 </td>
@@ -78,16 +158,38 @@
                                                     {{ $application->submission_deadline->format('M d, Y') }}
                                                 </td>
                                                 <td class="py-2 px-4 border-b border-gray-200">
+                                                    @if($application->status === 'Pending')
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                            Pending
+                                                        </span>
+                                                    @elseif($application->status === 'Approved')
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                            Approved
+                                                        </span>
+                                                    @elseif($application->status === 'Rejected')
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                            Rejected
+                                                        </span>
+                                                    @elseif($application->status === 'Submitted')
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                            Submitted
+                                                        </span>
+                                                    @else
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                            {{ $application->status }}
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td class="py-2 px-4 border-b border-gray-200">
                                                     <div class="flex space-x-2">
                                                         <a href="{{ route('dean.show', $application->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-xs">
                                                             View
                                                         </a>
-                                                        <a href="{{ route('dean.approve', $application->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded text-xs" onclick="return confirm('Are you sure you want to approve this application?')">
-                                                            Approve
-                                                        </a>
-                                                        <button type="button" onclick="showRejectModal({{ $application->id }})" class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded text-xs">
-                                                            Reject
-                                                        </button>
+                                                        @if($application->status === 'Approved')
+                                                            <a href="{{ route('dean.approval-document', $application->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded text-xs">
+                                                                Approval Doc
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -96,18 +198,11 @@
                                 </table>
                             </div>
                             
-                            <div class="mt-4 flex justify-between items-center">
-                                <div>
-                                    <button type="submit" id="bulk-approve-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50" disabled>
-                                        Bulk Approve Selected
-                                    </button>
-                                </div>
-                                <div>
-                                    {{ $pendingApplications->links() }}
-                                </div>
+                            <div class="mt-4">
+                                {{ $allApplications->links() }}
                             </div>
-                        </form>
-                    @endif
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

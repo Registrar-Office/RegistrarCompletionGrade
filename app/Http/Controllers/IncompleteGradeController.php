@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\IncompleteGrade;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,6 +35,12 @@ class IncompleteGradeController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 
+     * Status flow:
+     * 1. 'Pending' - Initial status when student creates the request (draft)
+     * 2. 'Submitted' - When student submits the request for dean's review
+     * 3. 'Approved' - When dean approves the request
+     * 4. 'Rejected' - When dean rejects the request
      */
     public function store(Request $request)
     {
@@ -46,11 +53,11 @@ class IncompleteGradeController extends Controller
             'course_id' => $request->course_id,
             'reason_for_incompleteness' => $request->reason_for_incompleteness,
             'submission_deadline' => now()->addMonths(3), // Default 3 months from now
-            'status' => 'Pending',
+            'status' => 'Pending', // Initial status is Pending (draft)
         ]);
         
         return redirect()->route('incomplete-grades.index')
-            ->with('success', 'Incomplete grade request submitted successfully.');
+            ->with('success', 'Incomplete grade request created successfully. Please submit it for review when ready.');
     }
 
     /**
@@ -98,6 +105,8 @@ class IncompleteGradeController extends Controller
 
     /**
      * Update the status of the incomplete grade.
+     * 
+     * This method is used when a student submits a pending request for review.
      */
     public function updateStatus(Request $request, IncompleteGrade $incompleteGrade)
     {
@@ -107,6 +116,17 @@ class IncompleteGradeController extends Controller
             'status' => 'required|in:Pending,Submitted,Approved,Rejected',
         ]);
         
+        // Only allow status change from Pending to Submitted for students
+        if (Auth::user()->role === 'student' && $request->status === 'Submitted' && $incompleteGrade->status === 'Pending') {
+            $incompleteGrade->update([
+                'status' => $request->status,
+            ]);
+            
+            return redirect()->route('incomplete-grades.index')
+                ->with('success', 'Your request has been submitted for review.');
+        }
+        
+        // For other roles or status changes
         $incompleteGrade->update([
             'status' => $request->status,
         ]);
@@ -126,5 +146,31 @@ class IncompleteGradeController extends Controller
         
         return redirect()->route('incomplete-grades.index')
             ->with('success', 'Incomplete grade request deleted successfully.');
+    }
+    
+    /**
+     * Allow students to view their approval documents.
+     */
+    public function viewApprovalDocument(IncompleteGrade $incompleteGrade)
+    {
+        $this->authorize('view', $incompleteGrade);
+        
+        // Check if the application is approved
+        if ($incompleteGrade->status !== 'Approved') {
+            return redirect()->route('incomplete-grades.index')
+                ->with('error', 'Approval document is only available for approved applications.');
+        }
+        
+        // Get the dean for this college
+        $dean = User::where('role', 'dean')
+            ->where('college', $incompleteGrade->course->college)
+            ->first();
+            
+        if (!$dean) {
+            return redirect()->route('incomplete-grades.index')
+                ->with('error', 'Could not find the dean information for this document.');
+        }
+        
+        return view('dean.approval-document', compact('incompleteGrade', 'dean'));
     }
 }

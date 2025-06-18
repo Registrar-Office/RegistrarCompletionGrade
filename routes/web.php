@@ -48,7 +48,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/applications/{incompleteGrade}/approve', [DeanDashboardController::class, 'approve'])->name('dean.approve');
         Route::put('/applications/{incompleteGrade}/reject', [DeanDashboardController::class, 'reject'])->name('dean.reject');
         Route::post('/applications/bulk-approve', [DeanDashboardController::class, 'bulkApprove'])->name('dean.bulk-approve');
+        Route::get('/applications/{incompleteGrade}/approval-document', [DeanDashboardController::class, 'approvalDocument'])->name('dean.approval-document');
     });
+    
+    // Allow students to view their approval documents
+    Route::get('/approval-documents/{incompleteGrade}', [IncompleteGradeController::class, 'viewApprovalDocument'])
+        ->middleware('can:view,incompleteGrade')
+        ->name('incomplete-grades.approval-document');
 });
 
 require __DIR__.'/auth.php';

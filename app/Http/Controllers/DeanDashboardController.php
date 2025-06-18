@@ -18,20 +18,28 @@ class DeanDashboardController extends Controller
     }
 
     /**
-     * Display a listing of pending applications for the dean's college.
+     * Display a listing of all applications for the dean's college.
      */
     public function index()
     {
         $dean = Auth::user();
-        $pendingApplications = IncompleteGrade::whereHas('course', function($query) use ($dean) {
+        $allApplications = IncompleteGrade::whereHas('course', function($query) use ($dean) {
                 $query->where('college', $dean->college);
             })
             ->with(['user', 'course'])
-            ->where('status', 'Pending')
-            ->orderBy('submission_deadline')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
         
-        return view('dean.dashboard', compact('pendingApplications'));
+        // Get submitted applications that need review
+        $submittedApplications = IncompleteGrade::whereHas('course', function($query) use ($dean) {
+                $query->where('college', $dean->college);
+            })
+            ->with(['user', 'course'])
+            ->where('status', 'Submitted')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return view('dean.dashboard', compact('allApplications', 'submittedApplications'));
     }
 
     /**
@@ -117,6 +125,11 @@ class DeanDashboardController extends Controller
             return redirect()->route('dean.signature')->with('error', 'You need to create a digital signature before approving applications.');
         }
         
+        // Check if application is in a status that can be approved
+        if ($incompleteGrade->status !== 'Submitted') {
+            return redirect()->route('dean.dashboard')->with('error', 'Only submitted applications can be approved.');
+        }
+        
         // Update the application status
         $incompleteGrade->update([
             'status' => 'Approved',
@@ -130,7 +143,7 @@ class DeanDashboardController extends Controller
         // Send email notification to the faculty
         $this->sendApprovalEmail($incompleteGrade);
         
-        return redirect()->route('dean.dashboard')->with('success', 'Application approved successfully.');
+        return redirect()->route('dean.approval-document', $incompleteGrade->id)->with('success', 'Application approved successfully.');
     }
 
     /**
@@ -155,7 +168,12 @@ class DeanDashboardController extends Controller
             ->whereHas('course', function($query) use ($dean) {
                 $query->where('college', $dean->college);
             })
+            ->where('status', 'Submitted')
             ->get();
+        
+        if ($applications->isEmpty()) {
+            return redirect()->route('dean.dashboard')->with('error', 'No valid applications selected for approval.');
+        }
         
         foreach ($applications as $application) {
             $application->update([
@@ -190,6 +208,11 @@ class DeanDashboardController extends Controller
             return redirect()->route('dean.dashboard')->with('error', 'You do not have permission to reject this application.');
         }
         
+        // Check if application is in a status that can be rejected
+        if ($incompleteGrade->status !== 'Submitted') {
+            return redirect()->route('dean.dashboard')->with('error', 'Only submitted applications can be rejected.');
+        }
+        
         // Update the application status
         $incompleteGrade->update([
             'status' => 'Rejected',
@@ -200,6 +223,26 @@ class DeanDashboardController extends Controller
         // This would be implemented similarly to the approval email
         
         return redirect()->route('dean.dashboard')->with('success', 'Application rejected successfully.');
+    }
+    
+    /**
+     * Display the approval document with the dean's signature.
+     */
+    public function approvalDocument(IncompleteGrade $incompleteGrade)
+    {
+        $dean = Auth::user();
+        
+        // Check if this application belongs to the dean's college
+        if ($incompleteGrade->course->college !== $dean->college) {
+            return redirect()->route('dean.dashboard')->with('error', 'You do not have permission to view this document.');
+        }
+        
+        // Check if the application is approved
+        if ($incompleteGrade->status !== 'Approved') {
+            return redirect()->route('dean.dashboard')->with('error', 'Approval document is only available for approved applications.');
+        }
+        
+        return view('dean.approval-document', compact('incompleteGrade', 'dean'));
     }
     
     /**
