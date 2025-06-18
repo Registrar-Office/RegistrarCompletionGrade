@@ -5,6 +5,6 @@ Students should be able to devise a student portal that connects the student who
 
 Incomplete:
 1. e-signature; upload e-signature
-2. Faculty dashboard - does not show approved grade completion request
+2. Faculty dashboard - approved grade does not show completion request
 3. Submission deadline - confused on how to apply it, Dean or Faculty? 
 4. Student Dashboard - fake users debugging
