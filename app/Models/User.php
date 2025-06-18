@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -23,6 +24,8 @@ class User extends Authenticatable
         'id_number',
         'email',
         'password',
+        'role',
+        'college',
     ];
 
     /**
@@ -54,6 +57,30 @@ class User extends Authenticatable
     public function incompleteGrades(): HasMany
     {
         return $this->hasMany(IncompleteGrade::class);
+    }
+    
+    /**
+     * Get the signature associated with the user.
+     */
+    public function signature(): HasOne
+    {
+        return $this->hasOne(Signature::class);
+    }
+
+    /**
+     * Check if the user is a dean.
+     */
+    public function isDean(): bool
+    {
+        return $this->role === 'dean';
+    }
+
+    /**
+     * Check if the user is a faculty member.
+     */
+    public function isFaculty(): bool
+    {
+        return $this->role === 'faculty';
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DeanDashboardController;
 use App\Http\Controllers\IncompleteGradeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'update'])->name('incomplete-grades.update');
     Route::delete('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'destroy'])->name('incomplete-grades.destroy');
     Route::patch('/incomplete-grades/{incompleteGrade}/status', [IncompleteGradeController::class, 'updateStatus'])->name('incomplete-grades.update-status');
+    
+    // Dean Dashboard Routes - use both auth and dean middleware
+    Route::middleware(['auth', 'dean'])->prefix('dean')->group(function () {
+        Route::get('/dashboard', [DeanDashboardController::class, 'index'])->name('dean.dashboard');
+        Route::get('/signature', [DeanDashboardController::class, 'manageSignature'])->name('dean.signature');
+        Route::post('/signature', [DeanDashboardController::class, 'storeSignature'])->name('dean.store-signature');
+        Route::get('/applications/{incompleteGrade}', [DeanDashboardController::class, 'show'])->name('dean.show');
+        Route::get('/applications/{incompleteGrade}/approve', [DeanDashboardController::class, 'approve'])->name('dean.approve');
+        Route::put('/applications/{incompleteGrade}/reject', [DeanDashboardController::class, 'reject'])->name('dean.reject');
+        Route::post('/applications/bulk-approve', [DeanDashboardController::class, 'bulkApprove'])->name('dean.bulk-approve');
+    });
 });
 
 require __DIR__.'/auth.php';

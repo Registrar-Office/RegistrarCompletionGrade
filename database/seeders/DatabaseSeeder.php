@@ -16,12 +16,33 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a user with the specified ID and password
-        $user = User::create([
+        // Create a student user with the specified ID and password
+        $student = User::create([
             'name' => 'John Doe',
             'id_number' => '22-2014-166',
             'email' => 'john.doe@example.com',
             'password' => Hash::make('Jeydicute1'),
+            'role' => 'student',
+        ]);
+        
+        // Create a dean user
+        $dean = User::create([
+            'name' => 'Dr. Jane Smith',
+            'id_number' => 'DEAN-2025-001',
+            'email' => 'jane.smith@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'dean',
+            'college' => 'College of Engineering',
+        ]);
+        
+        // Create a faculty user
+        $faculty = User::create([
+            'name' => 'Prof. Robert Johnson',
+            'id_number' => 'FAC-2025-001',
+            'email' => 'robert.johnson@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'faculty',
+            'college' => 'College of Engineering',
         ]);
 
         // Create some courses
@@ -29,17 +50,20 @@ class DatabaseSeeder extends Seeder
             [
                 'code' => 'CS101',
                 'title' => 'Introduction to Computer Science',
-                'instructor_name' => 'Dr. Smith',
+                'instructor_name' => 'FAC-2025-001', // Using faculty ID
+                'college' => 'College of Engineering',
             ],
             [
                 'code' => 'MATH202',
                 'title' => 'Calculus II',
-                'instructor_name' => 'Prof. Johnson',
+                'instructor_name' => 'FAC-2025-001',
+                'college' => 'College of Engineering',
             ],
             [
                 'code' => 'ENG110',
                 'title' => 'English Composition',
                 'instructor_name' => 'Dr. Williams',
+                'college' => 'College of Liberal Arts',
             ],
         ];
 
@@ -50,21 +74,21 @@ class DatabaseSeeder extends Seeder
         // Create some incomplete grades for the user
         $incompleteGrades = [
             [
-                'user_id' => $user->id,
+                'user_id' => $student->id,
                 'course_id' => 1,
                 'reason_for_incompleteness' => 'Missed final exam due to illness',
                 'submission_deadline' => now()->addDays(30),
                 'status' => 'Pending',
             ],
             [
-                'user_id' => $user->id,
+                'user_id' => $student->id,
                 'course_id' => 2,
                 'reason_for_incompleteness' => 'Incomplete project submission',
                 'submission_deadline' => now()->addDays(15),
                 'status' => 'Submitted',
             ],
             [
-                'user_id' => $user->id,
+                'user_id' => $student->id,
                 'course_id' => 3,
                 'reason_for_incompleteness' => 'Missing term paper',
                 'submission_deadline' => now()->addDays(7),

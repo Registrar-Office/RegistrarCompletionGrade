@@ -19,6 +19,7 @@ class Course extends Model
         'code',
         'title',
         'instructor_name',
+        'college',
     ];
     
     /**

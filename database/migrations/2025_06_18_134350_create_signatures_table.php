@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('incomplete_grades', function (Blueprint $table) {
+        Schema::create('signatures', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
-            $table->text('reason_for_incompleteness');
-            $table->date('submission_deadline');
-            $table->enum('status', ['Pending', 'Submitted', 'Approved', 'Rejected'])->default('Pending');
+            $table->string('signature_image')->nullable(); // Path to the signature image
+            $table->text('signature_data')->nullable(); // For storing the raw signature data
+            $table->timestamp('last_used')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incomplete_grades');
+        Schema::dropIfExists('signatures');
     }
 };

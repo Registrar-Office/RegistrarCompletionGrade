@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class IncompleteGrade extends Model
+class Signature extends Model
 {
     use HasFactory;
     
@@ -17,11 +17,9 @@ class IncompleteGrade extends Model
      */
     protected $fillable = [
         'user_id',
-        'course_id',
-        'reason_for_incompleteness',
-        'submission_deadline',
-        'status',
-        'rejection_reason',
+        'signature_image',
+        'signature_data',
+        'last_used',
     ];
     
     /**
@@ -30,22 +28,14 @@ class IncompleteGrade extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'submission_deadline' => 'date',
+        'last_used' => 'datetime',
     ];
     
     /**
-     * Get the user that owns the incomplete grade.
+     * Get the user that owns the signature.
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-    
-    /**
-     * Get the course that owns the incomplete grade.
-     */
-    public function course(): BelongsTo
-    {
-        return $this->belongsTo(Course::class);
     }
 }

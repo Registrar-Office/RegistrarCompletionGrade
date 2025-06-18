@@ -68,9 +68,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('incomplete-grades.index')" :active="request()->routeIs('incomplete-grades.*')">
-                {{ __('Grade Completion') }}
-            </x-responsive-nav-link>
+            
+            @if(Auth::check() && Auth::user()->role === 'dean')
+                <x-responsive-nav-link :href="route('dean.dashboard')" :active="request()->routeIs('dean.*')">
+                    {{ __('Dean Dashboard') }}
+                </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('incomplete-grades.index')" :active="request()->routeIs('incomplete-grades.*')">
+                    {{ __('Grade Completion') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -78,6 +85,12 @@
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                @if(Auth::check() && Auth::user()->role)
+                    <div class="font-medium text-sm text-gray-500">Role: {{ ucfirst(Auth::user()->role) }}</div>
+                @endif
+                @if(Auth::check() && Auth::user()->college)
+                    <div class="font-medium text-sm text-gray-500">College: {{ Auth::user()->college }}</div>
+                @endif
             </div>
 
             <div class="mt-3 space-y-1">
