@@ -48,33 +48,26 @@
                                                 <div class="text-sm text-gray-900">{{ Str::limit($grade->reason_for_incompleteness, 50) }}</div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    @if ($grade->status == 'Pending') bg-yellow-100 text-yellow-800
-                                                    @elseif ($grade->status == 'Submitted') bg-blue-100 text-blue-800
-                                                    @elseif ($grade->status == 'Approved') bg-green-100 text-green-800
-                                                    @else bg-red-100 text-red-800
-                                                    @endif">
-                                                    {{ $grade->status }}
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    Incomplete
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div class="flex space-x-2">
-                                                    @if ($grade->status == 'Pending')
-                                                        <form action="{{ route('incomplete-grades.update-status', $grade) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <input type="hidden" name="status" value="Submitted">
-                                                            <button type="submit" class="text-green-600 hover:text-green-900">
-                                                                Apply
-                                                            </button>
-                                                        </form>
-                                                    @endif
+                                                    <form action="{{ route('incomplete-grades.update-status', $grade) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="status" value="Submitted">
+                                                        <button type="submit" class="text-green-600 hover:text-green-900">
+                                                            Apply
+                                                        </button>
+                                                    </form>
                                                     
                                                     <form action="{{ route('incomplete-grades.destroy', $grade) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this item?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="text-red-600 hover:text-red-900">
-                                                            Delete
+                                                            Cancel
                                                         </button>
                                                     </form>
                                                 </div>
