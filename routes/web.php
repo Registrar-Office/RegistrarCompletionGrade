@@ -4,6 +4,7 @@ use App\Http\Controllers\DeanDashboardController;
 use App\Http\Controllers\IncompleteGradeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AnnouncementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/approval-documents/{incompleteGrade}', [IncompleteGradeController::class, 'viewApprovalDocument'])
         ->middleware('can:view,incompleteGrade')
         ->name('incomplete-grades.approval-document');
+
+    // Announcement routes
+    Route::resource('announcement', AnnouncementController::class)->only(['index', 'create', 'store']);
 });
 
 require __DIR__.'/auth.php';

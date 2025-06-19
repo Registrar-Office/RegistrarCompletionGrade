@@ -45,12 +45,13 @@ class DatabaseSeeder extends Seeder
             'college' => 'College of Engineering',
         ]);
 
-        // Create some courses
-        $courses = [
+        // Create some courses and store their IDs
+        $courseRecords = [];
+        foreach ([
             [
                 'code' => 'CS101',
                 'title' => 'Introduction to Computer Science',
-                'instructor_name' => 'FAC-2025-001', // Using faculty ID
+                'instructor_name' => 'FAC-2025-001',
                 'college' => 'College of Engineering',
             ],
             [
@@ -65,31 +66,29 @@ class DatabaseSeeder extends Seeder
                 'instructor_name' => 'Dr. Williams',
                 'college' => 'College of Liberal Arts',
             ],
-        ];
-
-        foreach ($courses as $course) {
-            Course::create($course);
+        ] as $course) {
+            $courseRecords[] = Course::create($course);
         }
 
-        // Create some incomplete grades for the user
+        // Create some incomplete grades for the user using the actual course IDs
         $incompleteGrades = [
             [
                 'user_id' => $student->id,
-                'course_id' => 1,
+                'course_id' => $courseRecords[0]->id,
                 'reason_for_incompleteness' => 'Missed final exam due to illness',
                 'submission_deadline' => now()->addDays(30),
                 'status' => 'Pending',
             ],
             [
                 'user_id' => $student->id,
-                'course_id' => 2,
+                'course_id' => $courseRecords[1]->id,
                 'reason_for_incompleteness' => 'Incomplete project submission',
                 'submission_deadline' => now()->addDays(15),
                 'status' => 'Submitted',
             ],
             [
                 'user_id' => $student->id,
-                'course_id' => 3,
+                'course_id' => $courseRecords[2]->id,
                 'reason_for_incompleteness' => 'Missing term paper',
                 'submission_deadline' => now()->addDays(7),
                 'status' => 'Pending',
@@ -99,5 +98,11 @@ class DatabaseSeeder extends Seeder
         foreach ($incompleteGrades as $grade) {
             IncompleteGrade::create($grade);
         }
+
+        App\Models\Course::create(['code' => 'TEST101', 'title' => 'Test Course', 'instructor_name' => 'FAC-2025-001', 'college' => 'Test College']);
+        App\Models\User::create(['name' => 'Test Dean', 'id_number' => 'DEAN-2025-001', 'email' => 'dean@example.com', 'password' => bcrypt('password'), 'role' => 'dean', 'college' => 'Test College']);
+
+        // Always seed a test course and dean for announcement testing
+        $this->call(AnnouncementTestSeeder::class);
     }
 }

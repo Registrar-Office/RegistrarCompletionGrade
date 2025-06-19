@@ -67,6 +67,12 @@
                         </svg>
                         Profile
                     </a>
+                    <a href="{{ route('announcement.index') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('announcement.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                        <svg class="mr-3 h-6 w-6 {{ request()->routeIs('announcement.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h-1v-4h-1m4 0h-1v4h-1" />
+                        </svg>
+                        Announcements
+                    </a>
                     <form method="POST" action="{{ route('logout') }}" class="mt-1">
                         @csrf
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-green-100 hover:bg-green-600 hover:text-white">
