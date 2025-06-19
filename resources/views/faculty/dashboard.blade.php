@@ -65,10 +65,7 @@
                                                 </td>
                                                 <td class="py-2 px-4 border-b border-gray-200">
                                                     <div class="flex space-x-2">
-                                                        <a href="{{ route('incomplete-grades.show', $application->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-xs">View</a>
-                                                        @if($application->status === 'Approved')
-                                                            <a href="{{ route('incomplete-grades.approval-document', $application->id) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded text-xs">Approval Doc</a>
-                                                        @endif
+                                                        <a href="{{ route('faculty.show', $application->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded text-xs">Review</a>
                                                     </div>
                                                 </td>
                                             </tr>

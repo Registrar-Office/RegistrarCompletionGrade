@@ -52,8 +52,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // Faculty Dashboard Route - use both auth and faculty middleware
-    Route::middleware(['auth', 'faculty'])->prefix('faculty')->group(function () {
+    Route::middleware(['auth', 'facultyonly'])->prefix('faculty')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\FacultyDashboardController::class, 'index'])->name('faculty.dashboard');
+        Route::get('/applications/{incompleteGrade}', [\App\Http\Controllers\FacultyDashboardController::class, 'show'])->name('faculty.show');
+        Route::put('/applications/{incompleteGrade}/reject', [\App\Http\Controllers\FacultyDashboardController::class, 'reject'])->name('faculty.reject');
+        Route::post('/applications/{incompleteGrade}/forward', [\App\Http\Controllers\FacultyDashboardController::class, 'forward'])->name('faculty.forward');
     });
     
     // Allow students to view their approval documents
