@@ -25,6 +25,9 @@
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Summary</th>
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Author</th>
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Date</th>
+                        @if(Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']))
+                            <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
@@ -35,6 +38,11 @@
                             <td class="px-6 py-4 whitespace-pre-line text-gray-700">{{ $announcement->body }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $announcement->user->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ $announcement->created_at->format('M d, Y H:i') }}</td>
+                            @if(Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']))
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{{ route('announcement.edit', $announcement) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded">Edit</a>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>

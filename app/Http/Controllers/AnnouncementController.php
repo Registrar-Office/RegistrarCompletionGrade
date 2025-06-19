@@ -39,8 +39,35 @@ class AnnouncementController extends Controller
             'course_id' => $validated['course_id'],
             'title' => $validated['title'],
             'body' => $validated['body'],
-            'user_id' => Auth::id(),
+            'user_id' => Auth::user()->id,
         ]);
         return redirect()->route('announcement.index')->with('success', 'Announcement created!');
+    }
+
+    public function edit(Announcement $announcement)
+    {
+        if (!in_array(Auth::user()->role, ['dean', 'faculty'])) {
+            abort(403);
+        }
+        $courses = Course::all();
+        return view('announcement.edit', compact('announcement', 'courses'));
+    }
+
+    public function update(Request $request, Announcement $announcement): RedirectResponse
+    {
+        if (!in_array(Auth::user()->role, ['dean', 'faculty'])) {
+            abort(403);
+        }
+        $validated = $request->validate([
+            'course_id' => 'required|exists:courses,id',
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+        $announcement->update([
+            'course_id' => $validated['course_id'],
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+        ]);
+        return redirect()->route('announcement.index')->with('success', 'Announcement updated!');
     }
 } 

@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Announcement;
 
 class AnnouncementTestSeeder extends Seeder
 {
@@ -27,6 +28,14 @@ class AnnouncementTestSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'dean',
             'college' => 'Test College',
+        ]);
+
+        // Create an announcement using the correct foreign keys
+        Announcement::create([
+            'course_id' => $course->id,
+            'title' => 'Test Announcement',
+            'body' => 'This is a test announcement for the course.',
+            'user_id' => $user->id,
         ]);
     }
 } 
