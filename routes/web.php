@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Faculty Dashboard Route - use both auth and faculty middleware
-    Route::middleware(['auth', 'facultyonly'])->prefix('faculty')->group(function () {
+    Route::middleware(['auth', \App\Http\Middleware\FacultyOnlyMiddleware::class])->prefix('faculty')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\FacultyDashboardController::class, 'index'])->name('faculty.dashboard');
         Route::get('/applications/{incompleteGrade}', [\App\Http\Controllers\FacultyDashboardController::class, 'show'])->name('faculty.show');
         Route::put('/applications/{incompleteGrade}/reject', [\App\Http\Controllers\FacultyDashboardController::class, 'reject'])->name('faculty.reject');
