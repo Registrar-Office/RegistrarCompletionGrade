@@ -50,6 +50,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/applications/bulk-approve', [DeanDashboardController::class, 'bulkApprove'])->name('dean.bulk-approve');
         Route::get('/applications/{incompleteGrade}/approval-document', [DeanDashboardController::class, 'approvalDocument'])->name('dean.approval-document');
     });
+
+    // Faculty Dashboard Route - use both auth and faculty middleware
+    Route::middleware(['auth', 'faculty'])->prefix('faculty')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\FacultyDashboardController::class, 'index'])->name('faculty.dashboard');
+    });
     
     // Allow students to view their approval documents
     Route::get('/approval-documents/{incompleteGrade}', [IncompleteGradeController::class, 'viewApprovalDocument'])
