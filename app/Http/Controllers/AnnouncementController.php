@@ -7,12 +7,28 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Announcement;
 use App\Models\Course;
+use App\Models\User;
 
 class AnnouncementController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::latest()->with('user')->get();
+        $user = Auth::user();
+        
+        if ($user->role === 'student') {
+            // Students see general announcements and those targeted to them
+            $announcements = Announcement::latest()
+                ->with(['user', 'targetStudent'])
+                ->where(function($query) use ($user) {
+                    $query->whereNull('target_student_id')  // General announcements
+                          ->orWhere('target_student_id', $user->id);  // Targeted to this student
+                })
+                ->get();
+        } else {
+            // Faculty and Dean see all announcements
+            $announcements = Announcement::latest()->with(['user', 'targetStudent'])->get();
+        }
+        
         return view('announcement.index', compact('announcements'));
     }
 
@@ -22,7 +38,8 @@ class AnnouncementController extends Controller
             abort(403);
         }
         $courses = Course::all();
-        return view('announcement.create', compact('courses'));
+        $students = User::where('role', 'student')->get();
+        return view('announcement.create', compact('courses', 'students'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -34,14 +51,27 @@ class AnnouncementController extends Controller
             'course_id' => 'required|exists:courses,id',
             'title' => 'required|string|max:255',
             'body' => 'required|string',
+            'target_student_id' => 'nullable|exists:users,id',
         ]);
+
+        // Verify that the target student is actually a student
+        if ($validated['target_student_id']) {
+            $targetStudent = User::find($validated['target_student_id']);
+            if ($targetStudent->role !== 'student') {
+                return back()->withErrors(['target_student_id' => 'The selected user is not a student.'])->withInput();
+            }
+        }
+
         Announcement::create([
             'course_id' => $validated['course_id'],
             'title' => $validated['title'],
             'body' => $validated['body'],
+            'target_student_id' => $validated['target_student_id'],
             'user_id' => Auth::user()->id,
         ]);
-        return redirect()->route('announcement.index')->with('success', 'Announcement created!');
+
+        $message = $validated['target_student_id'] ? 'Announcement sent to student!' : 'Announcement created!';
+        return redirect()->route('announcement.index')->with('success', $message);
     }
 
     public function edit(Announcement $announcement)
@@ -50,7 +80,8 @@ class AnnouncementController extends Controller
             abort(403);
         }
         $courses = Course::all();
-        return view('announcement.edit', compact('announcement', 'courses'));
+        $students = User::where('role', 'student')->get();
+        return view('announcement.edit', compact('announcement', 'courses', 'students'));
     }
 
     public function update(Request $request, Announcement $announcement): RedirectResponse
@@ -62,12 +93,25 @@ class AnnouncementController extends Controller
             'course_id' => 'required|exists:courses,id',
             'title' => 'required|string|max:255',
             'body' => 'required|string',
+            'target_student_id' => 'nullable|exists:users,id',
         ]);
+
+        // Verify that the target student is actually a student
+        if ($validated['target_student_id']) {
+            $targetStudent = User::find($validated['target_student_id']);
+            if ($targetStudent->role !== 'student') {
+                return back()->withErrors(['target_student_id' => 'The selected user is not a student.'])->withInput();
+            }
+        }
+
         $announcement->update([
             'course_id' => $validated['course_id'],
             'title' => $validated['title'],
             'body' => $validated['body'],
+            'target_student_id' => $validated['target_student_id'],
         ]);
-        return redirect()->route('announcement.index')->with('success', 'Announcement updated!');
+
+        $message = $validated['target_student_id'] ? 'Announcement updated and sent to student!' : 'Announcement updated!';
+        return redirect()->route('announcement.index')->with('success', $message);
     }
 } 

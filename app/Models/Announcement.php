@@ -15,6 +15,7 @@ class Announcement extends Model
         'body',
         'user_id',
         'course_id',
+        'target_student_id',
     ];
 
     public function user(): BelongsTo
@@ -25,5 +26,10 @@ class Announcement extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    public function targetStudent(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'target_student_id');
     }
 } 

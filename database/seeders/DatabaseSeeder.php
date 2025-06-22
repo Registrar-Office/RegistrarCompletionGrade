@@ -25,6 +25,15 @@ class DatabaseSeeder extends Seeder
             'role' => 'student',
         ]);
         
+        // Create a second student user
+        $student2 = User::create([
+            'name' => 'Maria Garcia',
+            'id_number' => '22-2015-234',
+            'email' => 'maria.garcia@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'student',
+        ]);
+        
         // Create a dean user
         $dean = User::create([
             'name' => 'Dr. Jane Smith',
@@ -92,6 +101,21 @@ class DatabaseSeeder extends Seeder
                 'reason_for_incompleteness' => 'Missing term paper',
                 'submission_deadline' => now()->addDays(7),
                 'status' => 'Pending',
+            ],
+            // Add incomplete grades for the second student
+            [
+                'user_id' => $student2->id,
+                'course_id' => $courseRecords[0]->id,
+                'reason_for_incompleteness' => 'Late submission of assignments',
+                'submission_deadline' => now()->addDays(20),
+                'status' => 'Pending',
+            ],
+            [
+                'user_id' => $student2->id,
+                'course_id' => $courseRecords[2]->id,
+                'reason_for_incompleteness' => 'Incomplete research paper',
+                'submission_deadline' => now()->addDays(10),
+                'status' => 'Submitted',
             ],
         ];
 

@@ -23,6 +23,9 @@
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Course</th>
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Title</th>
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Summary</th>
+                        @if(Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']))
+                            <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Target Student</th>
+                        @endif
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Author</th>
                         <th class="px-6 py-4 text-left text-lg font-semibold text-gray-700">Date</th>
                         @if(Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']))
@@ -36,6 +39,17 @@
                             <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ $announcement->course->title ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900 font-semibold">{{ $announcement->title }}</td>
                             <td class="px-6 py-4 whitespace-pre-line text-gray-700">{{ $announcement->body }}</td>
+                            @if(Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']))
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-700">
+                                    @if($announcement->targetStudent)
+                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                                            {{ $announcement->targetStudent->name }} ({{ $announcement->targetStudent->id_number }})
+                                        </span>
+                                    @else
+                                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm">All Students</span>
+                                    @endif
+                                </td>
+                            @endif
                             <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $announcement->user->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ $announcement->created_at->format('M d, Y H:i') }}</td>
                             @if(Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']))
@@ -46,7 +60,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500 text-lg">No announcements yet.</td>
+                            <td colspan="{{ Auth::check() && in_array(Auth::user()->role, ['dean', 'faculty']) ? '7' : '5' }}" class="px-6 py-8 text-center text-gray-500 text-lg">No announcements yet.</td>
                         </tr>
                     @endforelse
                 </tbody>
