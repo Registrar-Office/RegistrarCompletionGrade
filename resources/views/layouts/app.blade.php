@@ -15,16 +15,16 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-pastel-blue">
-        <div class="min-h-screen bg-pastel-blue flex">
-            <!-- Sidebar -->
-            <div class="bg-green-700 w-64 shadow-md hidden sm:block">
+        <div class="min-h-screen bg-pastel-blue">
+            <!-- Fixed Sidebar -->
+            <div class="fixed inset-y-0 left-0 z-50 bg-green-700 w-64 shadow-md hidden sm:block">
                 <div class="p-4 border-b border-green-800">
                     <a href="{{ route('dashboard') }}" class="flex items-center">
                         <x-application-logo class="block h-9 w-auto fill-current text-white" />
                         <span class="ml-3 text-xl font-semibold text-white">UC Registrar</span>
                     </a>
                 </div>
-                <nav class="mt-5 px-2">
+                <nav class="mt-5 px-2 overflow-y-auto h-full">
                     <a href="{{ route('dashboard') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
                         <svg class="mr-3 h-6 w-6 {{ request()->routeIs('dashboard') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -85,8 +85,8 @@
                 </nav>
             </div>
 
-            <!-- Main Content -->
-            <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Main Content Area (with left margin to account for fixed sidebar) -->
+            <div class="sm:ml-64">
                 @include('layouts.navigation')
 
                 <!-- Page Heading -->
@@ -99,7 +99,7 @@
                 @endisset
 
                 <!-- Page Content -->
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-pastel-blue">
+                <main class="overflow-x-hidden overflow-y-auto bg-pastel-blue">
                     <div class="py-6">
                         {{ $slot }}
                     </div>
