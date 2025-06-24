@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'update'])->name('incomplete-grades.update');
     Route::delete('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'destroy'])->name('incomplete-grades.destroy');
     Route::patch('/incomplete-grades/{incompleteGrade}/status', [IncompleteGradeController::class, 'updateStatus'])->name('incomplete-grades.update-status');
+    Route::get('/incomplete-grades/{incompleteGrade}/download-attachment', [IncompleteGradeController::class, 'downloadAttachment'])
+        ->name('incomplete-grades.download-attachment');
     
     // Dean Dashboard Routes - use both auth and dean middleware
     Route::middleware(['auth', 'dean'])->prefix('dean')->group(function () {

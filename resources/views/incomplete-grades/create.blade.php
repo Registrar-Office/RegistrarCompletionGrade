@@ -14,7 +14,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('incomplete-grades.store') }}">
+                    <form method="POST" action="{{ route('incomplete-grades.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Course Selection -->
@@ -38,6 +38,21 @@
                             <label for="reason_for_incompleteness" class="block font-medium text-sm text-gray-700">Reason for Incompleteness</label>
                             <textarea id="reason_for_incompleteness" name="reason_for_incompleteness" rows="4" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>{{ old('reason_for_incompleteness') }}</textarea>
                             @error('reason_for_incompleteness')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- File Attachment -->
+                        <div class="mb-4">
+                            <label for="attachment" class="block font-medium text-sm text-gray-700">Supporting Document (optional)</label>
+                            <input type="file" id="attachment" name="attachment" class="mt-1 block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-md file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-50 file:text-blue-700
+                                hover:file:bg-blue-100">
+                            <p class="text-xs text-gray-500 mt-1">Accepted file types: PDF, DOC, DOCX, JPG, JPEG, PNG (max 10MB)</p>
+                            @error('attachment')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>

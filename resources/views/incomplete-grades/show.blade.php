@@ -69,6 +69,20 @@
                         </div>
                     </div>
 
+                    @if($incompleteGrade->attachment_path)
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-900">Supporting Document</h3>
+                        <div class="mt-2">
+                            <a href="{{ route('incomplete-grades.download-attachment', $incompleteGrade) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-md font-medium text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                                Download Attachment
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="mt-8 flex space-x-4">
                         <a href="{{ route('incomplete-grades.edit', $incompleteGrade) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             Edit

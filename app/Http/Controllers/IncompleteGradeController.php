@@ -7,6 +7,7 @@ use App\Models\IncompleteGrade;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class IncompleteGradeController extends Controller
 {
@@ -47,14 +48,23 @@ class IncompleteGradeController extends Controller
         $request->validate([
             'course_id' => 'required|exists:courses,id',
             'reason_for_incompleteness' => 'required|string',
+            'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
         ]);
         
-        Auth::user()->incompleteGrades()->create([
+        $data = [
             'course_id' => $request->course_id,
             'reason_for_incompleteness' => $request->reason_for_incompleteness,
             'submission_deadline' => now()->addMonths(3), // Default 3 months from now
             'status' => 'Pending', // Initial status is Pending (draft)
-        ]);
+        ];
+        
+        // Handle file upload if present
+        if ($request->hasFile('attachment')) {
+            $path = $request->file('attachment')->store('incomplete-grade-attachments', 'public');
+            $data['attachment_path'] = $path;
+        }
+        
+        Auth::user()->incompleteGrades()->create($data);
         
         return redirect()->route('incomplete-grades.index')
             ->with('success', 'Incomplete grade request created successfully. Please submit it for review when ready.');
@@ -92,12 +102,26 @@ class IncompleteGradeController extends Controller
         $request->validate([
             'course_id' => 'required|exists:courses,id',
             'reason_for_incompleteness' => 'required|string',
+            'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
         ]);
         
-        $incompleteGrade->update([
+        $data = [
             'course_id' => $request->course_id,
             'reason_for_incompleteness' => $request->reason_for_incompleteness,
-        ]);
+        ];
+        
+        // Handle file upload if present
+        if ($request->hasFile('attachment')) {
+            // Delete old file if exists
+            if ($incompleteGrade->attachment_path) {
+                Storage::disk('public')->delete($incompleteGrade->attachment_path);
+            }
+            
+            $path = $request->file('attachment')->store('incomplete-grade-attachments', 'public');
+            $data['attachment_path'] = $path;
+        }
+        
+        $incompleteGrade->update($data);
         
         return redirect()->route('incomplete-grades.index')
             ->with('success', 'Incomplete grade request updated successfully.');
@@ -142,6 +166,11 @@ class IncompleteGradeController extends Controller
     {
         $this->authorize('delete', $incompleteGrade);
         
+        // Delete attachment if exists
+        if ($incompleteGrade->attachment_path) {
+            Storage::disk('public')->delete($incompleteGrade->attachment_path);
+        }
+        
         $incompleteGrade->delete();
         
         return redirect()->route('incomplete-grades.index')
@@ -172,5 +201,19 @@ class IncompleteGradeController extends Controller
         }
         
         return view('dean.approval-document', compact('incompleteGrade', 'dean'));
+    }
+    
+    /**
+     * Download the attachment file.
+     */
+    public function downloadAttachment(IncompleteGrade $incompleteGrade)
+    {
+        $this->authorize('view', $incompleteGrade);
+        
+        if (!$incompleteGrade->attachment_path) {
+            return redirect()->back()->with('error', 'No attachment found for this request.');
+        }
+        
+        return Storage::disk('public')->download($incompleteGrade->attachment_path);
     }
 }

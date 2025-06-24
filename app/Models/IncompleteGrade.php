@@ -22,6 +22,7 @@ class IncompleteGrade extends Model
         'submission_deadline',
         'status',
         'rejection_reason',
+        'attachment_path',
     ];
     
     /**

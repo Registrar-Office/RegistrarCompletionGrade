@@ -57,6 +57,20 @@
                             </div>
                         </div>
                         
+                        @if($incompleteGrade->attachment_path)
+                        <div class="mb-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-2">Supporting Document</h4>
+                            <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                                <a href="{{ route('incomplete-grades.download-attachment', $incompleteGrade) }}" class="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-300 rounded-md font-medium text-sm text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Download Supporting Document
+                                </a>
+                            </div>
+                        </div>
+                        @endif
+                        
                         <div class="mb-6">
                             <h4 class="text-sm font-semibold text-gray-700 mb-2">Submission Details</h4>
                             <div class="bg-gray-50 p-4 rounded border border-gray-200">
