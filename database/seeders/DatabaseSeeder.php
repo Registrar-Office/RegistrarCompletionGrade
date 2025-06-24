@@ -25,12 +25,12 @@ class DatabaseSeeder extends Seeder
             'role' => 'student',
         ]);
         
-        // Create a second student user
+        // Create another student user
         $student2 = User::create([
-            'name' => 'Maria Garcia',
+            'name' => 'Jane Doe',
             'id_number' => '22-2015-234',
-            'email' => 'maria.garcia@example.com',
-            'password' => Hash::make('password123'),
+            'email' => 'jane.doe@example.com',
+            'password' => Hash::make('password'),
             'role' => 'student',
         ]);
         
@@ -102,28 +102,13 @@ class DatabaseSeeder extends Seeder
                 'submission_deadline' => now()->addDays(7),
                 'status' => 'Pending',
             ],
-            // Add incomplete grades for the second student
-            [
-                'user_id' => $student2->id,
-                'course_id' => $courseRecords[0]->id,
-                'reason_for_incompleteness' => 'Late submission of assignments',
-                'submission_deadline' => now()->addDays(20),
-                'status' => 'Pending',
-            ],
-            [
-                'user_id' => $student2->id,
-                'course_id' => $courseRecords[2]->id,
-                'reason_for_incompleteness' => 'Incomplete research paper',
-                'submission_deadline' => now()->addDays(10),
-                'status' => 'Submitted',
-            ],
         ];
 
         foreach ($incompleteGrades as $grade) {
             IncompleteGrade::create($grade);
         }
 
-        Course::create(['code' => 'TEST101', 'title' => 'Test Course', 'instructor_name' => 'FAC-2025-001', 'college' => 'Test College']);
+        
         // Removed duplicate Test Dean user creation to avoid unique constraint violation
         // User::create(['name' => 'Test Dean', 'id_number' => 'DEAN-2025-001', 'email' => 'dean@example.com', 'password' => bcrypt('password'), 'role' => 'dean', 'college' => 'Test College']);
 
