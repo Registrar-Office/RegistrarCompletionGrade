@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
         ->name('incomplete-grades.approval-document');
 
     // Announcement routes
-    Route::resource('announcement', AnnouncementController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::resource('announcement', AnnouncementController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 });
 
 require __DIR__.'/auth.php';

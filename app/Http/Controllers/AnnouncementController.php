@@ -114,4 +114,14 @@ class AnnouncementController extends Controller
         $message = $validated['target_student_id'] ? 'Announcement updated and sent to student!' : 'Announcement updated!';
         return redirect()->route('announcement.index')->with('success', $message);
     }
+
+    public function destroy(Announcement $announcement)
+    {
+        // Only allow the author to delete
+        if (Auth::user() && Auth::user()->id == $announcement->user_id) {
+            $announcement->delete();
+            return redirect()->route('announcement.index')->with('success', 'Announcement deleted successfully.');
+        }
+        abort(403, 'Unauthorized action.');
+    }
 } 
