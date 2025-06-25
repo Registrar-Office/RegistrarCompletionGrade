@@ -64,6 +64,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/applications/{incompleteGrade}', [\App\Http\Controllers\FacultyDashboardController::class, 'show'])->name('faculty.show');
         Route::put('/applications/{incompleteGrade}/reject', [\App\Http\Controllers\FacultyDashboardController::class, 'reject'])->name('faculty.reject');
         Route::post('/applications/{incompleteGrade}/forward', [\App\Http\Controllers\FacultyDashboardController::class, 'forward'])->name('faculty.forward');
+        Route::get('/courses/{course}/grade-checklist', [\App\Http\Controllers\FacultyDashboardController::class, 'gradeChecklist'])->name('faculty.grade-checklist');
+        Route::post('/courses/{course}/grade-checklist/{student}', [\App\Http\Controllers\FacultyDashboardController::class, 'updateGradeChecklist'])->name('faculty.grade-checklist.update');
     });
     
     // Allow students to view their approval documents
@@ -73,6 +75,9 @@ Route::middleware('auth')->group(function () {
 
     // Announcement routes
     Route::resource('announcement', AnnouncementController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    // Student Grade Checklist View
+    Route::middleware('auth')->get('/profile/grade-checklist', [\App\Http\Controllers\ProfileController::class, 'gradeChecklist'])->name('profile.grade-checklist');
 });
 
 require __DIR__.'/auth.php';

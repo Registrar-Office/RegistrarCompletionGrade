@@ -90,4 +90,20 @@ class User extends Authenticatable
     {
         return 'id_number';
     }
+
+    /**
+     * Get the grade checklists for the student.
+     */
+    public function gradeChecklists()
+    {
+        return $this->hasMany(\App\Models\GradeChecklist::class, 'student_id');
+    }
+
+    /**
+     * Get the grade checklists for the faculty.
+     */
+    public function facultyGradeChecklists()
+    {
+        return $this->hasMany(\App\Models\GradeChecklist::class, 'faculty_id');
+    }
 }

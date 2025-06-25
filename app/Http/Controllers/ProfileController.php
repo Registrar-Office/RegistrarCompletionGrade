@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\GradeChecklist;
 
 class ProfileController extends Controller
 {
@@ -56,5 +57,15 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Show the student's grade checklist.
+     */
+    public function gradeChecklist()
+    {
+        $user = Auth::user();
+        $checklists = $user->gradeChecklists()->with('course', 'faculty')->get();
+        return view('profile.grade-checklist', compact('checklists'));
     }
 }

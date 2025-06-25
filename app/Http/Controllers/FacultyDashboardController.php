@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\IncompleteGrade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\GradeChecklist;
+use App\Models\Course;
+use App\Models\User;
 
 class FacultyDashboardController extends Controller
 {
@@ -80,5 +83,63 @@ class FacultyDashboardController extends Controller
             'rejection_reason' => null,
         ]);
         return redirect()->route('faculty.dashboard')->with('success', 'Application forwarded to dean for approval.');
+    }
+
+    /**
+     * Show and edit grade checklist for a course.
+     */
+    public function gradeChecklist(Request $request, $courseId)
+    {
+        $faculty = Auth::user();
+        $course = Course::findOrFail($courseId);
+        if ($course->instructor_name !== $faculty->id_number) {
+            abort(403, 'Unauthorized action.');
+        }
+        $students = User::where('role', 'student')->get();
+        $checklists = GradeChecklist::where('course_id', $courseId)->with('student')->get();
+        $courses = Course::all();
+        return view('faculty.grade-checklist', compact('course', 'students', 'checklists', 'courses'));
+    }
+
+    /**
+     * Update a student's grade in the checklist.
+     */
+    public function updateGradeChecklist(Request $request, $courseId, $studentId)
+    {
+        $faculty = Auth::user();
+        $course = Course::findOrFail($courseId);
+        if ($course->instructor_name !== $faculty->id_number) {
+            abort(403, 'Unauthorized action.');
+        }
+        $request->validate([
+            'grade' => 'required|in:Passed,Failed,INC,NFE',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+        $selectedCourseId = $request->input('course_id');
+        $checklist = GradeChecklist::firstOrNew([
+            'student_id' => $studentId,
+            'course_id' => $selectedCourseId,
+        ]);
+        $checklist->faculty_id = $faculty->id;
+        $checklist->grade = $request->grade;
+        $checklist->save();
+
+        // If grade is Failed, INC, or NFE, create incomplete grade if not exists
+        if (in_array($request->grade, ['Failed', 'INC', 'NFE'])) {
+            $student = User::findOrFail($studentId);
+            $existing = IncompleteGrade::where('user_id', $studentId)
+                ->where('course_id', $selectedCourseId)
+                ->first();
+            if (!$existing) {
+                IncompleteGrade::create([
+                    'user_id' => $studentId,
+                    'course_id' => $selectedCourseId,
+                    'reason_for_incompleteness' => $request->grade === 'Failed' ? 'Failed grade' : ($request->grade === 'INC' ? 'Incomplete' : 'No Final Exam'),
+                    'submission_deadline' => now()->addMonths(3),
+                    'status' => 'Pending',
+                ]);
+            }
+        }
+        return redirect()->back()->with('success', 'Grade checklist updated successfully.');
     }
 } 

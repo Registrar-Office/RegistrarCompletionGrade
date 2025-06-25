@@ -52,6 +52,12 @@
                             </svg>
                             Faculty Dashboard
                         </a>
+                        <a href="{{ optional(\App\Models\Course::where('instructor_name', Auth::user()->id_number)->first()) ? route('faculty.grade-checklist', ['course' => \App\Models\Course::where('instructor_name', Auth::user()->id_number)->first()->id]) : '#' }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('faculty.grade-checklist') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                            <svg class="mr-3 h-6 w-6 {{ request()->routeIs('faculty.grade-checklist') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Students Checklist
+                        </a>
                     @else
                         <a href="{{ route('incomplete-grades.index') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('incomplete-grades.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
                             <svg class="mr-3 h-6 w-6 {{ request()->routeIs('incomplete-grades.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -73,6 +79,14 @@
                         </svg>
                         Rules & Guidelines
                     </a>
+                    @if(Auth::check() && Auth::user()->role === 'student')
+                        <a href="{{ route('profile.grade-checklist') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.grade-checklist') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                            <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.grade-checklist') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Grade Checklist
+                        </a>
+                    @endif
                     <a href="{{ route('profile.edit') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
                         <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
