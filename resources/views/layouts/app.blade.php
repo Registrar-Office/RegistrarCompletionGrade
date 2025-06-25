@@ -61,17 +61,23 @@
                         </a>
                     @endif
                     
-                    <a href="{{ route('profile.edit') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
-                        <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        Profile
-                    </a>
                     <a href="{{ route('announcement.index') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('announcement.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
                         <svg class="mr-3 h-6 w-6 {{ request()->routeIs('announcement.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h-1v-4h-1m4 0h-1v4h-1" />
                         </svg>
                         Announcements
+                    </a>
+                    <a href="{{ route('rules.index') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('rules.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                        <svg class="mr-3 h-6 w-6 {{ request()->routeIs('rules.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        Rules & Guidelines
+                    </a>
+                    <a href="{{ route('profile.edit') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                        <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Profile
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="mt-1">
                         @csrf

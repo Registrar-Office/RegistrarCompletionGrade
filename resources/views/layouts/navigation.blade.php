@@ -78,6 +78,10 @@
                     {{ __('Grade Completion') }}
                 </x-responsive-nav-link>
             @endif
+            
+            <x-responsive-nav-link :href="route('rules.index')" :active="request()->routeIs('rules.*')">
+                {{ __('Rules & Guidelines') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

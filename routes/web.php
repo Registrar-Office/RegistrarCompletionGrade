@@ -3,6 +3,7 @@
 use App\Http\Controllers\DeanDashboardController;
 use App\Http\Controllers\IncompleteGradeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RulesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnnouncementController;
 
@@ -29,6 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Rules and Guidelines route - accessible to all authenticated users
+    Route::get('/rules', [RulesController::class, 'index'])->name('rules.index');
     
     // Incomplete Grades Routes
     Route::get('/incomplete-grades', [IncompleteGradeController::class, 'index'])->name('incomplete-grades.index');
