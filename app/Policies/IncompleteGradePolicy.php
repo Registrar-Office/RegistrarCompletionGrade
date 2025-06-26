@@ -21,7 +21,17 @@ class IncompleteGradePolicy
      */
     public function view(User $user, IncompleteGrade $incompleteGrade): bool
     {
-        return $user->id === $incompleteGrade->user_id;
+        // Allow the owner of the application to view it
+        if ($user->id === $incompleteGrade->user_id) {
+            return true;
+        }
+        
+        // Allow deans to view applications from their college
+        if ($user->role === 'dean' && $incompleteGrade->course->college === $user->college) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**
