@@ -11,6 +11,9 @@
                 <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-medium text-gray-900">Welcome, {{ Auth::user()->name }}!</h3>
                     <p class="mt-1 text-sm text-gray-600">ID Number: {{ Auth::user()->id_number }}</p>
+                    @if(Auth::user()->major)
+                        <p class="mt-1 text-sm text-gray-600">Course/Major: {{ Auth::user()->major }}</p>
+                    @endif
                     
                     @if(Auth::check() && Auth::user()->role === 'dean')
                         <div class="mt-6">
@@ -44,17 +47,32 @@
                         </div>
                     @else
                         <div class="mt-6">
-                            <h4 class="text-md font-medium text-gray-900">Grade Completion</h4>
-                            <p class="mt-1 text-sm text-gray-600">View and manage your incomplete grades and completion requirements. Please note that grade completion has specific <a href="{{ route('rules.index') }}" class="text-blue-600 hover:text-blue-800 underline font-medium">rules and guidelines</a> that must be followed.</p>
+                            <h4 class="text-md font-medium text-gray-900">Student Dashboard</h4>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Your incomplete grades will appear when your faculty marks any of your courses as Failed, INC, or NFE. 
+                                You can also view your curriculum and check the rules and guidelines for grade completion.
+                            </p>
                             
-                            <div class="mt-4">
-                                <a href="{{ route('incomplete-grades.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    View Incomplete Grades
-                                </a>
+                            <div class="mt-4 space-y-2">
+                                <div>
+                                    <a href="{{ route('incomplete-grades.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        View Incomplete Grades
+                                    </a>
+                                    
+                                    <a href="{{ route('profile.curriculum') }}" class="ml-4 inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        View My Curriculum
+                                    </a>
+                                </div>
                                 
-                                <a href="{{ route('rules.index') }}" class="ml-4 inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                    View Rules & Guidelines
-                                </a>
+                                <div>
+                                    <a href="{{ route('rules.index') }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        View Rules & Guidelines
+                                    </a>
+                                    
+                                    <a href="{{ route('profile.grade-checklist') }}" class="ml-4 inline-flex items-center px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 focus:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        View Grade Checklist
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @endif

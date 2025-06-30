@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use App\Models\Course;
 use App\Models\IncompleteGrade;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,6 +22,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'john.doe@example.com',
             'password' => Hash::make('Jeydicute1'),
             'role' => 'student',
+            'major' => 'BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY/Web Technology Track',
         ]);
         
         // Create another student user
@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'jane.doe@example.com',
             'password' => Hash::make('password'),
             'role' => 'student',
+            'major' => 'BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY/Network Security Track',
         ]);
         
         // Create a dean user
@@ -72,46 +73,20 @@ class DatabaseSeeder extends Seeder
             [
                 'code' => 'ENG110',
                 'title' => 'English Composition',
-                'instructor_name' => 'Dr. Williams',
+                'instructor_name' => 'FAC-2025-001',
                 'college' => 'College of Liberal Arts',
             ],
         ] as $course) {
             $courseRecords[] = Course::create($course);
         }
 
-        // Create some incomplete grades for the user using the actual course IDs
-        $incompleteGrades = [
-            [
-                'user_id' => $student->id,
-                'course_id' => $courseRecords[0]->id,
-                'reason_for_incompleteness' => 'Missed final exam due to illness',
-                'submission_deadline' => now()->addDays(30),
-                'status' => 'Pending',
-            ],
-            [
-                'user_id' => $student->id,
-                'course_id' => $courseRecords[1]->id,
-                'reason_for_incompleteness' => 'Incomplete project submission',
-                'submission_deadline' => now()->addDays(15),
-                'status' => 'Submitted',
-            ],
-            [
-                'user_id' => $student->id,
-                'course_id' => $courseRecords[2]->id,
-                'reason_for_incompleteness' => 'Missing term paper',
-                'submission_deadline' => now()->addDays(7),
-                'status' => 'Pending',
-            ],
-        ];
-
-        foreach ($incompleteGrades as $grade) {
-            IncompleteGrade::create($grade);
-        }
-
+        // DO NOT pre-create incomplete grades
+        // Students should start with empty dashboards
+        // Faculty will create incomplete grades when they mark students as Failed/INC/NFE
         
-        // Removed duplicate Test Dean user creation to avoid unique constraint violation
-        // User::create(['name' => 'Test Dean', 'id_number' => 'DEAN-2025-001', 'email' => 'dean@example.com', 'password' => bcrypt('password'), 'role' => 'dean', 'college' => 'Test College']);
-
+        // Seed curriculum data
+        $this->call(CurriculumSeeder::class);
+        
         // Always seed a test course and dean for announcement testing
         $this->call(AnnouncementTestSeeder::class);
     }

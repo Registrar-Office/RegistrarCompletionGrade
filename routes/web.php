@@ -34,23 +34,14 @@ Route::middleware('auth')->group(function () {
     // Rules and Guidelines route - accessible to all authenticated users
     Route::get('/rules', [RulesController::class, 'index'])->name('rules.index');
     
-    // Incomplete Grades Routes
-    Route::get('/incomplete-grades', [IncompleteGradeController::class, 'index'])->name('incomplete-grades.index');
-    Route::get('/incomplete-grades/create', [IncompleteGradeController::class, 'create'])->name('incomplete-grades.create');
-    Route::post('/incomplete-grades', [IncompleteGradeController::class, 'store'])->name('incomplete-grades.store');
-    Route::get('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'show'])->name('incomplete-grades.show');
-    Route::get('/incomplete-grades/{incompleteGrade}/edit', [IncompleteGradeController::class, 'edit'])->name('incomplete-grades.edit');
-    Route::put('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'update'])->name('incomplete-grades.update');
-    Route::delete('/incomplete-grades/{incompleteGrade}', [IncompleteGradeController::class, 'destroy'])->name('incomplete-grades.destroy');
-    Route::patch('/incomplete-grades/{incompleteGrade}/status', [IncompleteGradeController::class, 'updateStatus'])->name('incomplete-grades.update-status');
-    Route::get('/incomplete-grades/{incompleteGrade}/download-attachment', [IncompleteGradeController::class, 'downloadAttachment'])
-        ->name('incomplete-grades.download-attachment');
+    // Incomplete grades resource routes
+    Route::resource('incomplete-grades', IncompleteGradeController::class);
     
     // Dean Dashboard Routes - use both auth and dean middleware
-    Route::middleware(['auth', 'dean'])->prefix('dean')->group(function () {
+    Route::middleware([\App\Http\Middleware\DeanOnlyMiddleware::class])->prefix('dean')->group(function () {
         Route::get('/dashboard', [DeanDashboardController::class, 'index'])->name('dean.dashboard');
         Route::get('/signature', [DeanDashboardController::class, 'manageSignature'])->name('dean.signature');
-        Route::post('/signature', [DeanDashboardController::class, 'storeSignature'])->name('dean.store-signature');
+        Route::post('/signature', [DeanDashboardController::class, 'storeSignature'])->name('dean.signature.store');
         Route::get('/applications/{incompleteGrade}', [DeanDashboardController::class, 'show'])->name('dean.show');
         Route::get('/applications/{incompleteGrade}/approve', [DeanDashboardController::class, 'approve'])->name('dean.approve');
         Route::put('/applications/{incompleteGrade}/reject', [DeanDashboardController::class, 'reject'])->name('dean.reject');
@@ -78,6 +69,9 @@ Route::middleware('auth')->group(function () {
 
     // Student Grade Checklist View
     Route::middleware('auth')->get('/profile/grade-checklist', [\App\Http\Controllers\ProfileController::class, 'gradeChecklist'])->name('profile.grade-checklist');
+    
+    // Student Curriculum View
+    Route::middleware('auth')->get('/profile/curriculum', [\App\Http\Controllers\ProfileController::class, 'curriculum'])->name('profile.curriculum');
 });
 
 require __DIR__.'/auth.php';
