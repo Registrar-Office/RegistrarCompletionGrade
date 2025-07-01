@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Models\GradeChecklist;
 use App\Models\Curriculum;
+use App\Models\Course;
 
 class ProfileController extends Controller
 {
@@ -61,13 +62,45 @@ class ProfileController extends Controller
     }
 
     /**
-     * Show the student's grade checklist.
+     * Show the student's grade checklist based on their curriculum.
      */
     public function gradeChecklist()
     {
         $user = Auth::user();
-        $checklists = $user->gradeChecklists()->with('course', 'faculty')->get();
-        return view('profile.grade-checklist', compact('checklists'));
+        
+        // Extract the track from the major - need to get the full track name including "Track"
+        $track = null;
+        if ($user->major) {
+            if (strpos($user->major, 'Web Technology') !== false) {
+                $track = 'Web Technology Track';
+            } elseif (strpos($user->major, 'Network Security') !== false) {
+                $track = 'Network Security Track';
+            }
+        }
+        
+        if (!$track) {
+            return view('profile.grade-checklist', [
+                'curriculumCourses' => collect(),
+                'track' => null,
+                'user' => $user,
+                'existingGrades' => collect()
+            ]);
+        }
+        
+        // Get curriculum courses for the student's track
+        $curriculumCourses = Curriculum::where('major', $track)
+            ->orderBy('year')
+            ->orderBy('trimester')
+            ->orderBy('subject_code')
+            ->get();
+            
+        // Get existing grade checklists for this student
+        $existingGrades = GradeChecklist::where('student_id', $user->id)
+            ->with('course')
+            ->get()
+            ->keyBy('course.code');
+        
+        return view('profile.grade-checklist', compact('curriculumCourses', 'track', 'user', 'existingGrades'));
     }
 
     /**
@@ -77,9 +110,15 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
-        // Extract the track from the major (e.g., "Web Technology Track" from "BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY/Web Technology Track")
-        $majorParts = explode('/', $user->major);
-        $track = isset($majorParts[1]) ? $majorParts[1] : null;
+        // Extract the track from the major - need to get the full track name including "Track"
+        $track = null;
+        if ($user->major) {
+            if (strpos($user->major, 'Web Technology') !== false) {
+                $track = 'Web Technology Track';
+            } elseif (strpos($user->major, 'Network Security') !== false) {
+                $track = 'Network Security Track';
+            }
+        }
         
         if (!$track) {
             return redirect()->route('dashboard')->with('error', 'Unable to determine your track from your major.');

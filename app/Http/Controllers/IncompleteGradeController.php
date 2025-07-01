@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\IncompleteGrade;
 use App\Models\User;
+use App\Models\GradeChecklist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -29,9 +30,13 @@ class IncompleteGradeController extends Controller
      */
     public function create()
     {
-        $courses = Course::all();
+        // Only show courses where the current student has been marked as Failed, INC, or NFE by faculty
+        $failedCourses = Course::whereHas('gradeChecklists', function ($query) {
+            $query->where('student_id', Auth::id())
+                  ->whereIn('grade', ['Failed', 'INC', 'NFE']);
+        })->get();
         
-        return view('incomplete-grades.create', compact('courses'));
+        return view('incomplete-grades.create', compact('failedCourses'));
     }
 
     /**
@@ -46,7 +51,21 @@ class IncompleteGradeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => [
+                'required',
+                'exists:courses,id',
+                function ($attribute, $value, $fail) {
+                    // Ensure the student can only create requests for courses they actually failed
+                    $hasFailedGrade = GradeChecklist::where('student_id', Auth::id())
+                        ->where('course_id', $value)
+                        ->whereIn('grade', ['Failed', 'INC', 'NFE'])
+                        ->exists();
+                    
+                    if (!$hasFailedGrade) {
+                        $fail('You can only create requests for courses where you have been marked as Failed, INC, or NFE by faculty.');
+                    }
+                }
+            ],
             'reason_for_incompleteness' => 'required|string',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
         ]);
@@ -87,9 +106,13 @@ class IncompleteGradeController extends Controller
     {
         $this->authorize('update', $incompleteGrade);
         
-        $courses = Course::all();
+        // Only show courses where the current student has been marked as Failed, INC, or NFE by faculty
+        $failedCourses = Course::whereHas('gradeChecklists', function ($query) {
+            $query->where('student_id', Auth::id())
+                  ->whereIn('grade', ['Failed', 'INC', 'NFE']);
+        })->get();
         
-        return view('incomplete-grades.edit', compact('incompleteGrade', 'courses'));
+        return view('incomplete-grades.edit', compact('incompleteGrade', 'failedCourses'));
     }
 
     /**
@@ -100,7 +123,21 @@ class IncompleteGradeController extends Controller
         $this->authorize('update', $incompleteGrade);
         
         $request->validate([
-            'course_id' => 'required|exists:courses,id',
+            'course_id' => [
+                'required',
+                'exists:courses,id',
+                function ($attribute, $value, $fail) {
+                    // Ensure the student can only update to courses they actually failed
+                    $hasFailedGrade = GradeChecklist::where('student_id', Auth::id())
+                        ->where('course_id', $value)
+                        ->whereIn('grade', ['Failed', 'INC', 'NFE'])
+                        ->exists();
+                    
+                    if (!$hasFailedGrade) {
+                        $fail('You can only create requests for courses where you have been marked as Failed, INC, or NFE by faculty.');
+                    }
+                }
+            ],
             'reason_for_incompleteness' => 'required|string',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
         ]);

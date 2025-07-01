@@ -29,4 +29,12 @@ class Course extends Model
     {
         return $this->hasMany(IncompleteGrade::class);
     }
+    
+    /**
+     * Get the grade checklists for the course.
+     */
+    public function gradeChecklists(): HasMany
+    {
+        return $this->hasMany(GradeChecklist::class);
+    }
 }

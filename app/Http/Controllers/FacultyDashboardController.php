@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\GradeChecklist;
 use App\Models\Course;
 use App\Models\User;
+use App\Models\Curriculum;
 
 class FacultyDashboardController extends Controller
 {
@@ -95,10 +96,33 @@ class FacultyDashboardController extends Controller
         if ($course->instructor_name !== $faculty->id_number) {
             abort(403, 'Unauthorized action.');
         }
+        
+        // Get all students
         $students = User::where('role', 'student')->get();
+        
+        // Get existing grade checklists
         $checklists = GradeChecklist::where('course_id', $courseId)->with('student')->get();
-        $courses = Course::all();
-        return view('faculty.grade-checklist', compact('course', 'students', 'checklists', 'courses'));
+        
+        // Get curriculum courses based on student's major
+        $curriculumCourses = [];
+        foreach ($students as $student) {
+            if ($student->major) {
+                // Extract the track from the major (Web Technology Track or Network Security Track)
+                $track = null;
+                if (strpos($student->major, 'Web Technology') !== false) {
+                    $track = 'Web Technology Track';
+                } elseif (strpos($student->major, 'Network Security') !== false) {
+                    $track = 'Network Security Track';
+                }
+                
+                if ($track) {
+                    $studentCurriculumCourses = Curriculum::where('major', $track)->get();
+                    $curriculumCourses[$student->id] = $studentCurriculumCourses;
+                }
+            }
+        }
+        
+        return view('faculty.grade-checklist', compact('course', 'students', 'checklists', 'curriculumCourses'));
     }
 
     /**
@@ -111,35 +135,34 @@ class FacultyDashboardController extends Controller
         if ($course->instructor_name !== $faculty->id_number) {
             abort(403, 'Unauthorized action.');
         }
+        
         $request->validate([
             'grade' => 'required|in:Passed,Failed,INC,NFE',
-            'course_id' => 'required|exists:courses,id',
+            'subject_code' => 'required|string',
+            'subject_name' => 'required|string',
         ]);
-        $selectedCourseId = $request->input('course_id');
+        
+        // Find or create a course based on the curriculum subject
+        $curriculumCourse = Course::firstOrCreate([
+            'code' => $request->subject_code,
+            'title' => $request->subject_name,
+        ], [
+            'instructor_name' => $faculty->id_number,
+            'college' => $faculty->college ?? 'College of Computer Studies',
+        ]);
+        
         $checklist = GradeChecklist::firstOrNew([
             'student_id' => $studentId,
-            'course_id' => $selectedCourseId,
+            'course_id' => $curriculumCourse->id,
         ]);
+        
         $checklist->faculty_id = $faculty->id;
         $checklist->grade = $request->grade;
         $checklist->save();
 
-        // If grade is Failed, INC, or NFE, create incomplete grade if not exists
-        if (in_array($request->grade, ['Failed', 'INC', 'NFE'])) {
-            $student = User::findOrFail($studentId);
-            $existing = IncompleteGrade::where('user_id', $studentId)
-                ->where('course_id', $selectedCourseId)
-                ->first();
-            if (!$existing) {
-                IncompleteGrade::create([
-                    'user_id' => $studentId,
-                    'course_id' => $selectedCourseId,
-                    'reason_for_incompleteness' => $request->grade === 'Failed' ? 'Failed grade' : ($request->grade === 'INC' ? 'Incomplete' : 'No Final Exam'),
-                    'submission_deadline' => now()->addMonths(3),
-                    'status' => 'Pending',
-                ]);
-            }
-        }
+        // If grade is Failed, INC, or NFE, but don't auto-create incomplete grade
+        // Let students create their own requests
+        
         return redirect()->back()->with('success', 'Grade checklist updated successfully.');
     }
-} 
+}
