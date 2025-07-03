@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/applications/{incompleteGrade}/forward', [\App\Http\Controllers\FacultyDashboardController::class, 'forward'])->name('faculty.forward');
         Route::get('/courses/{course}/grade-checklist', [\App\Http\Controllers\FacultyDashboardController::class, 'gradeChecklist'])->name('faculty.grade-checklist');
         Route::post('/courses/{course}/grade-checklist/{student}', [\App\Http\Controllers\FacultyDashboardController::class, 'updateGradeChecklist'])->name('faculty.grade-checklist.update');
+        Route::get('/courses/{course}/student/{student}/checklist', [\App\Http\Controllers\FacultyDashboardController::class, 'showStudentChecklist'])->name('faculty.student-checklist');
     });
     
     // Allow students to view their approval documents

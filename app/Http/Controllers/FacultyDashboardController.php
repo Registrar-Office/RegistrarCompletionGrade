@@ -165,4 +165,31 @@ class FacultyDashboardController extends Controller
         
         return redirect()->back()->with('success', 'Grade checklist updated successfully.');
     }
+
+    /**
+     * Show and edit the grade checklist for a specific student in a course.
+     */
+    public function showStudentChecklist($courseId, $studentId)
+    {
+        $faculty = Auth::user();
+        $course = Course::findOrFail($courseId);
+        if ($course->instructor_name !== $faculty->id_number) {
+            abort(403, 'Unauthorized action.');
+        }
+        $student = User::where('role', 'student')->findOrFail($studentId);
+        $checklists = GradeChecklist::where('course_id', $courseId)->where('student_id', $studentId)->with('student')->get();
+        $curriculumCourses = collect();
+        if ($student->major) {
+            $track = null;
+            if (strpos($student->major, 'Web Technology') !== false) {
+                $track = 'Web Technology Track';
+            } elseif (strpos($student->major, 'Network Security') !== false) {
+                $track = 'Network Security Track';
+            }
+            if ($track) {
+                $curriculumCourses = Curriculum::where('major', $track)->get();
+            }
+        }
+        return view('faculty.student-checklist', compact('course', 'student', 'checklists', 'curriculumCourses'));
+    }
 }
