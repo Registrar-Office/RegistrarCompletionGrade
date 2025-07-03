@@ -80,19 +80,27 @@
                         Rules & Guidelines
                     </a>
                     @if(Auth::check() && Auth::user()->role === 'student')
-                        <a href="{{ route('profile.grade-checklist') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.grade-checklist') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
-                            <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.grade-checklist') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" class="w-full flex items-center px-2 py-2 text-sm font-medium rounded-md focus:outline-none focus:bg-green-800 {{ request()->routeIs('profile.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                                <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Profile
+                                <svg class="ml-auto h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+                            <div x-show="open" @click.away="open = false" class="absolute left-0 w-full mt-1 bg-green-800 rounded-md shadow-lg z-10">
+                                <a href="{{ route('profile.grade-checklist') }}" class="block px-4 py-2 text-sm text-white hover:bg-green-600 {{ request()->routeIs('profile.grade-checklist') ? 'bg-green-900' : '' }}">Grade Checklist</a>
+                                <a href="{{ route('profile.curriculum') }}" class="block px-4 py-2 text-sm text-white hover:bg-green-600 {{ request()->routeIs('profile.curriculum') ? 'bg-green-900' : '' }}">View Curriculum</a>
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('profile.edit') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
+                            <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
-                            Grade Checklist
+                            Profile
                         </a>
                     @endif
-                    <a href="{{ route('profile.edit') }}" class="mt-1 group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('profile.*') ? 'bg-green-800 text-white' : 'text-green-100 hover:bg-green-600 hover:text-white' }}">
-                        <svg class="mr-3 h-6 w-6 {{ request()->routeIs('profile.*') ? 'text-green-300' : 'text-green-200 group-hover:text-green-100' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        Profile
-                    </a>
                     <form method="POST" action="{{ route('logout') }}" class="mt-1">
                         @csrf
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-green-100 hover:bg-green-600 hover:text-white">
