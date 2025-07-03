@@ -23,6 +23,7 @@ class IncompleteGrade extends Model
         'status',
         'rejection_reason',
         'attachment_path',
+        'grade',
     ];
     
     /**

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Curriculum;
+use App\Models\Course;
 use Illuminate\Database\Seeder;
 
 class CurriculumSeeder extends Seeder
@@ -164,9 +165,19 @@ class CurriculumSeeder extends Seeder
             ['major' => 'Network Security Track', 'subject_code' => 'OJT401', 'subject_name' => 'On-the-Job Training (480 hours)', 'year' => 4, 'trimester' => null, 'units' => 6, 'prerequisite' => 'IT401'],
         ];
 
-        // Insert all curriculum data
-        foreach (array_merge($webTechCurriculum, $netSecCurriculum) as $curriculum) {
+        // Insert all curriculum data and ensure all courses exist
+        $allCurriculum = array_merge($webTechCurriculum, $netSecCurriculum);
+        foreach ($allCurriculum as $curriculum) {
             Curriculum::create($curriculum);
+            // Ensure a Course exists for each subject_code
+            Course::firstOrCreate(
+                ['code' => $curriculum['subject_code']],
+                [
+                    'title' => $curriculum['subject_name'],
+                    'instructor_name' => 'TBA', // Default placeholder
+                    'college' => 'TBA' // Default placeholder
+                ]
+            );
         }
     }
 }

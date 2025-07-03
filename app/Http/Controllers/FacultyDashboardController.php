@@ -160,8 +160,16 @@ class FacultyDashboardController extends Controller
         $checklist->grade = $request->grade;
         $checklist->save();
 
-        // If grade is Failed, INC, or NFE, but don't auto-create incomplete grade
-        // Let students create their own requests
+        // If grade is Failed, INC, or NFE, update IncompleteGrade if it exists
+        if (in_array($request->grade, ['Failed', 'INC', 'NFE'])) {
+            $incompleteGrade = IncompleteGrade::where('user_id', $studentId)
+                ->where('course_id', $curriculumCourse->id)
+                ->first();
+            if ($incompleteGrade) {
+                $incompleteGrade->grade = $request->grade;
+                $incompleteGrade->save();
+            }
+        }
         
         return redirect()->back()->with('success', 'Grade checklist updated successfully.');
     }

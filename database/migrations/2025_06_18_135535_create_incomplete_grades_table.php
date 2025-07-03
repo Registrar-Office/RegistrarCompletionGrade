@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('reason_for_incompleteness');
             $table->date('submission_deadline');
             $table->enum('status', ['Pending', 'Submitted', 'Approved', 'Rejected'])->default('Pending');
+            $table->enum('grade', ['Passed', 'Failed', 'INC', 'NFE'])->nullable();
             $table->text('rejection_reason')->nullable();
             $table->timestamps();
         });
