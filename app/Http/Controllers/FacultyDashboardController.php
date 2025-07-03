@@ -131,10 +131,6 @@ class FacultyDashboardController extends Controller
     public function updateGradeChecklist(Request $request, $courseId, $studentId)
     {
         $faculty = Auth::user();
-        $course = Course::findOrFail($courseId);
-        if ($course->instructor_name !== $faculty->id_number) {
-            abort(403, 'Unauthorized action.');
-        }
         
         $request->validate([
             'grade' => 'required|in:Passed,Failed,INC,NFE',
@@ -143,13 +139,22 @@ class FacultyDashboardController extends Controller
         ]);
         
         // Find or create a course based on the curriculum subject
-        $curriculumCourse = Course::firstOrCreate([
-            'code' => $request->subject_code,
-            'title' => $request->subject_name,
-        ], [
-            'instructor_name' => $faculty->id_number,
-            'college' => $faculty->college ?? 'College of Computer Studies',
-        ]);
+        $curriculumCourse = Course::where('code', $request->subject_code)->first();
+        
+        if (!$curriculumCourse) {
+            $curriculumCourse = Course::create([
+                'code' => $request->subject_code,
+                'title' => $request->subject_name,
+                'instructor_name' => $faculty->id_number,
+                'college' => $faculty->college ?? 'College of Computer Studies',
+            ]);
+        } else {
+            // Update the instructor_name if the course exists but has a different instructor
+            if ($curriculumCourse->instructor_name !== $faculty->id_number) {
+                $curriculumCourse->instructor_name = $faculty->id_number;
+                $curriculumCourse->save();
+            }
+        }
         
         $checklist = GradeChecklist::firstOrNew([
             'student_id' => $studentId,
@@ -181,9 +186,15 @@ class FacultyDashboardController extends Controller
     {
         $faculty = Auth::user();
         $course = Course::findOrFail($courseId);
-        if ($course->instructor_name !== $faculty->id_number) {
+        
+        // Allow access if this is a faculty member and either:
+        // 1. The course belongs to them, OR
+        // 2. The course has no assigned instructor (TBA) or placeholder data
+        if ($course->instructor_name !== $faculty->id_number && 
+            !in_array($course->instructor_name, ['TBA', 'N/A', null, ''])) {
             abort(403, 'Unauthorized action.');
         }
+        
         $student = User::where('role', 'student')->findOrFail($studentId);
         $checklists = GradeChecklist::where('course_id', $courseId)->where('student_id', $studentId)->with('student')->get();
         $curriculumCourses = collect();

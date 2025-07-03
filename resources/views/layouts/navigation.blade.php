@@ -73,10 +73,6 @@
                 <x-responsive-nav-link :href="route('dean.dashboard')" :active="request()->routeIs('dean.*')">
                     {{ __('Dean Dashboard') }}
                 </x-responsive-nav-link>
-            @else
-                <x-responsive-nav-link :href="route('incomplete-grades.index')" :active="request()->routeIs('incomplete-grades.*')">
-                    {{ __('Grade Completion') }}
-                </x-responsive-nav-link>
             @endif
             
             <x-responsive-nav-link :href="route('rules.index')" :active="request()->routeIs('rules.*')">

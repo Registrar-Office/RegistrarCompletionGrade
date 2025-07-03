@@ -43,7 +43,25 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($curriculumCourses as $curriculumCourse)
                                     @php
+                                        // Find course by code first
                                         $existingCourse = \App\Models\Course::where('code', $curriculumCourse->subject_code)->first();
+                                        
+                                        // If course doesn't exist, create it
+                                        if (!$existingCourse) {
+                                            $existingCourse = \App\Models\Course::create([
+                                                'code' => $curriculumCourse->subject_code,
+                                                'title' => $curriculumCourse->subject_name,
+                                                'instructor_name' => Auth::user()->id_number,
+                                                'college' => Auth::user()->college ?? 'College of Computer Studies',
+                                            ]);
+                                        } else {
+                                            // Update instructor if needed
+                                            if ($existingCourse->instructor_name !== Auth::user()->id_number) {
+                                                $existingCourse->instructor_name = Auth::user()->id_number;
+                                                $existingCourse->save();
+                                            }
+                                        }
+                                        
                                         $checklist = null;
                                         if ($existingCourse) {
                                             $checklist = $checklists->where('student_id', $student->id ?? null)
