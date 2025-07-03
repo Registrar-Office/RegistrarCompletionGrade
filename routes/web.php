@@ -38,7 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('incomplete-grades', IncompleteGradeController::class);
     
     // Dean Dashboard Routes - use both auth and dean middleware
-    Route::middleware([\App\Http\Middleware\DeanOnlyMiddleware::class])->prefix('dean')->group(function () {
+    Route::middleware([\App\Http\Middleware\DeanRoleMiddleware::class])->prefix('dean')->group(function () {
         Route::get('/dashboard', [DeanDashboardController::class, 'index'])->name('dean.dashboard');
         Route::get('/signature', [DeanDashboardController::class, 'manageSignature'])->name('dean.signature');
         Route::post('/signature', [DeanDashboardController::class, 'storeSignature'])->name('dean.signature.store');

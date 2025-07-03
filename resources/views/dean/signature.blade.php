@@ -26,7 +26,7 @@
                         <p class="mb-4">Create or update your digital signature below. This signature will be used when approving incomplete grade applications.</p>
                         
                         <div class="mb-6">
-                            <form action="{{ route('dean.store-signature') }}" method="POST" id="signature-form">
+                            <form action="{{ route('dean.signature.store') }}" method="POST" id="signature-form">
                                 @csrf
                                 
                                 <div class="mb-4">
@@ -128,4 +128,4 @@
             @endif
         });
     </script>
-</x-app-layout> 
+</x-app-layout>
